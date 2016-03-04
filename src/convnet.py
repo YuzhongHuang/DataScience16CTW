@@ -334,4 +334,4 @@ def dropout_layer(layer, p_dropout):
     return layer*T.cast(mask, theano.config.floatX)
 
 #### Inverse functions
-def softmax_inverse()
+# def softmax_inverse()
