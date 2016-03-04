@@ -46,14 +46,16 @@ if GPU:
 else:
     print "Running with a CPU"
 
-#### Load the data
-def load_data_shared():
-    """ run through the data folder to create a programmatically
-    useful format of the data
+#### Load the COR data
+def load_image_data(path="../data/COR/"):
+	image_data = []
+	for fn in os.listdir(path):
+		print fn
+		with open(path+fn, 'r+b') as f:
+			with Image.open(f) as im:
+				image_data.append(numpy.asarray(list(im.getdata())))
 
-    To be implemented
-
-    """
+	return numpy.asarray(image_data)
 
 #### Main class used to construct and train networks
 class Network(object):
