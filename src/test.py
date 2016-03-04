@@ -1,32 +1,23 @@
-import os
-from PIL import Image
-import numpy
-import pandas
+import convnet
+from convnet import Network
+from convnet import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer
 
-def load_image_data(path="../data/COR_pro/"):
-	image_data = []
+training_data, validation_data, test_data = convnet.load_data()
+mini_batch_size = 10
 
-	files = [fn for fn in os.listdir(path)]
-	files.sort()
+net = Network([
+        ConvPoolLayer(image_shape=(mini_batch_size, 1, 44, 44), 
+                      filter_shape=(20, 1, 5, 5), 
+                      poolsize=(2, 2)),
+        ConvPoolLayer(image_shape=(mini_batch_size, 20, 20, 20), 
+                      filter_shape=(40, 20, 5, 5), 
+                      poolsize=(2, 2)),
+        FullyConnectedLayer(n_in=40*8*8, n_out=100),
+        SoftmaxLayer(n_in=100, n_out=4)], mini_batch_size)
 
-	for fn in files:
-		with open(path+fn, 'r+b') as f:
-			with Image.open(f) as im:
-				image_data.append(numpy.asarray(list(im.getdata())))
-	return numpy.asarray(image_data)
+net.SGD(training_data, 100, mini_batch_size, 0.2, 
+            validation_data, test_data, lmbda=0.1)
 
-def load_result_data(path="../data/"):
-	df = pandas.read_csv(path+"data_summary.csv", sep=',')
-	df["CDR"] = df["CDR"].fillna(0.0)
-
-	return numpy.asarray(df["CDR"].tolist())
-
-def get_id(s):
-	return int(s[5:9])
-
-def merge_data(image, cdr):
-	return zip(image, cdr)
-
-print len(load_result_data())
-print len(load_image_data())
-# merge_data(load_image_data(), load_result_data())
+net.save()
+net = Network.load("","./trained_model/tra_net.pkl")
+net.feedforward(training_data[0][2], 1)

@@ -16,11 +16,8 @@ from Chris Olah (http://colah.github.io ).
 """
 
 #### Libraries
-# Standard library
-import cPickle
-import gzip
-
 # Third-party libraries
+import pickle
 import numpy as np
 import theano
 import theano.tensor as T
@@ -28,6 +25,9 @@ from theano.tensor.nnet import conv
 from theano.tensor.nnet import softmax
 from theano.tensor import shared_randomstreams
 from theano.tensor.signal import downsample
+
+# Local helping libraries
+import load_data
 
 # Activation functions for neurons
 def linear(z): return z
@@ -46,16 +46,22 @@ if GPU:
 else:
     print "Running with a CPU"
 
-#### Load the COR data
-def load_image_data(path="../data/COR/"):
-	image_data = []
-	for fn in os.listdir(path):
-		print fn
-		with open(path+fn, 'r+b') as f:
-			with Image.open(f) as im:
-				image_data.append(numpy.asarray(list(im.getdata())))
+#### theano shared data
+def shared(data):
+    """Place the data into shared variables.  This allows Theano to copy
+    the data to the GPU, if one is available.
 
-	return numpy.asarray(image_data)
+    """
+    shared_x = theano.shared(
+        np.asarray(data[0], dtype=theano.config.floatX), borrow=True)
+    shared_y = theano.shared(
+        np.asarray(data[1], dtype=theano.config.floatX), borrow=True)
+    return shared_x, T.cast(shared_y, "int32")
+
+#### load dataset which is a tuple of image array and result array
+def load_data(data=load_data.load_all()):
+    train, val, test = data
+    return [shared(train), shared(val), shared(test)]
 
 #### Main class used to construct and train networks
 class Network(object):
@@ -79,6 +85,41 @@ class Network(object):
                 prev_layer.output, prev_layer.output_dropout, self.mini_batch_size)
         self.output = self.layers[-1].output
         self.output_dropout = self.layers[-1].output_dropout
+
+    def feedforward(self, data, size=1):
+        cur_layer = self.layers[0]
+        data = data.reshape((size,)+cur_layer.image_shape[1:])
+        output = conv.conv2d(data, cur_layer.w,
+            image_shape = (size,)+cur_layer.image_shape[1:],
+            filter_shape = cur_layer.filter_shape)
+        output = downsample.max_pool_2d(output, ds=cur_layer.poolsize, ignore_border=True)
+
+        cur_layer = self.layers[1]
+        data = output.eval()
+        output = conv.conv2d(data, cur_layer.w,
+            image_shape = (size,)+cur_layer.image_shape[1:],
+            filter_shape = cur_layer.filter_shape)
+        output = downsample.max_pool_2d(output, ds=cur_layer.poolsize, ignore_border=True)
+
+        cur_layer = self.layers[2]
+        data = output.eval()
+        output = sigmoid(np.dot(data.reshape(3200,), cur_layer.w.get_value())+cur_layer.b.get_value())
+
+        cur_layer = self.layers[3]
+        data = output.eval()
+        output = softmax((1-cur_layer.p_dropout)*T.dot(data, cur_layer.w.get_value()) + cur_layer.b.get_value())
+        y_out = T.argmax(output, axis=1).eval()
+
+        return output.eval()
+
+    def save(self, filepath="", filename="trained_net.pkl"):
+        with open(filename, 'wb') as output:
+            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+
+    @staticmethod
+    def load(filepath="", filename="trained_net.pkl"):
+        with open(filename, 'rb') as inpt:
+            return pickle.load(inpt)
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             validation_data, test_data, lmbda=0.0):
@@ -138,12 +179,13 @@ class Network(object):
         for epoch in xrange(epochs):
             for minibatch_index in xrange(num_training_batches):
                 iteration = num_training_batches*epoch+minibatch_index
-                if iteration % 1000 == 0:
+                if iteration % 10 == 0:
                     print("Training mini-batch number {0}".format(iteration))
                 cost_ij = train_mb(minibatch_index)
                 if (iteration+1) % num_training_batches == 0:
                     validation_accuracy = np.mean(
                         [validate_mb_accuracy(j) for j in xrange(num_validation_batches)])
+                    print [validate_mb_accuracy(j) for j in xrange(num_validation_batches)]
                     print("Epoch {0}: validation accuracy {1:.2%}".format(
                         epoch, validation_accuracy))
                     if validation_accuracy >= best_validation_accuracy:
@@ -187,7 +229,7 @@ class ConvPoolLayer(object):
         self.filter_shape = filter_shape
         self.image_shape = image_shape
         self.poolsize = poolsize
-        self.activation_fn=activation_fn
+        self.activation_fn=activation_fnsigmoid
         # initialize weights and biases
         n_out = (filter_shape[0]*np.prod(filter_shape[2:])/np.prod(poolsize))
         self.w = theano.shared(
@@ -203,7 +245,7 @@ class ConvPoolLayer(object):
         self.params = [self.w, self.b]
 
     def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
-        self.inpt = inpt.reshape(self.image_shape)
+        self.inpt = inpt.reshape((mini_batch_size, ) + self.image_shape[1:])
         conv_out = conv.conv2d(
             input=self.inpt, filters=self.w, filter_shape=self.filter_shape,
             image_shape=self.image_shape)
@@ -261,6 +303,7 @@ class SoftmaxLayer(object):
             np.zeros((n_out,), dtype=theano.config.floatX),
             name='b', borrow=True)
         self.params = [self.w, self.b]
+        self.activation_fn = softmax
 
     def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
         self.inpt = inpt.reshape((mini_batch_size, self.n_in))
@@ -289,3 +332,6 @@ def dropout_layer(layer, p_dropout):
         np.random.RandomState(0).randint(999999))
     mask = srng.binomial(n=1, p=1-p_dropout, size=layer.shape)
     return layer*T.cast(mask, theano.config.floatX)
+
+#### Inverse functions
+def softmax_inverse()
