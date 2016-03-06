@@ -3,17 +3,17 @@ from PIL import Image
 from resizeimage import resizeimage
 
 path_cor = '../../data/COR/'
-dest_path_cor = '../../data/COR_pro/'
+dest_path_cor = '../../data/COR_44/'
 size_cor = [44, 44]
 name_cor = "_44_44"
 
 path_sag = '../../data/SAG/'
-dest_path_sag = '../../data/SAG_pro/'
+dest_path_sag = '../../data/SAG_44/'
 size_sag = [52, 44]
 name_sag = "_52_44"
 
 path_tra = '../../data/TRA/'
-dest_path_tra = '../../data/TRA_pro/'
+dest_path_tra = '../../data/TRA_44/'
 size_tra = [44, 52]
 name_tra = "_44_52"
 
