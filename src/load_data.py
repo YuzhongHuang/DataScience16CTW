@@ -1,31 +1,62 @@
 import os
 from PIL import Image
+import theano
 import numpy
 import pandas
+import pickle
 
-def load_image_data(path="../data/TRA_pro/"):
-	image_data = []
+class data_loader:
 
-	files = [fn for fn in os.listdir(path)]
-	files.sort()
+	def __init__(self, paths={"COR":"../data/COR_pro/", "SAG":"../data/SAG_pro/", "TRA":"../data/TRA_pro/"}, results=["CDR"]):
+		self.paths = paths
+		self.results = results
 
-	for fn in files:
-		with open(path+fn, 'r+b') as f:
-			with Image.open(f) as im:
-				image_data.append(numpy.asarray(list(im.getdata())))
-	return numpy.asarray(image_data)
+		self.img_data = {}
+		self.res_data = {}
 
-def load_result_data(path="../data/"):
-	df = pandas.read_csv(path+"data_summary.csv", sep=',')
-	df["CDR"] = df["CDR"].fillna(0.0)
-	df["CDR"] = df["CDR"].apply(lambda x:int(2*x))
-	# df["CDR"] = df["CDR"].apply(lambda x: x-1 if x == 4 else x)
+		self.test_size = 100
+		self.val_size = 100
+		self.train_size = 216
 
-	return numpy.asarray(df["CDR"].tolist())
+		for img_type in paths:
+			self.img_data[img_type] = self.load_image_data(paths[img_type])
+		for result in results:	
+			self.res_data[result] = self.load_result_data(result)
 
-def load_all():
-	return (
-			(load_image_data()[0:120], load_result_data()[0:120]), \
-			(load_image_data()[120:240], load_result_data()[120:240]), \
-			(load_image_data()[240:-1], load_result_data()[240:-1]), \
-			)
+	def save(self, filename):
+		with open(filename, 'wb') as output:
+			pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+
+	@staticmethod
+	def load(filename):
+		with open(filename, 'rb') as inpt:
+			return pickle.load(inpt)
+
+	def load_image_data(self, path):
+		image_data = []
+
+		files = [fn for fn in os.listdir(path)]
+		files.sort()
+
+		for fn in files:
+			with open(path+fn, 'r+b') as f:
+				with Image.open(f) as im:
+					image_data.append(numpy.asarray(list(im.getdata()), dtype=theano.config.floatX))
+		return numpy.asarray(image_data)
+
+	def load_result_data(self, column, path="../data/processed_data_summary.csv"):
+		df = pandas.read_csv(path, sep=',')
+		lst = df[column].tolist()
+		return numpy.asarray(lst)
+
+	def load_for_learn(self, img_type, result):
+		test = self.train_size
+		val = self.train_size + self.val_size
+
+		return (
+				(self.img_data[img_type][val:-1], 		self.res_data[img_type][result][val:-1]), \
+				(self.img_data[img_type][0:test], 		self.res_data[img_type][result][0:test]), \
+				(self.img_data[img_type][test:val],	self.res_data[img_type][result][test:val]), \
+				)
+
+data_loader().save("./DATA_loader/loader")

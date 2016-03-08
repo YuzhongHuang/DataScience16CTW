@@ -59,8 +59,8 @@ def shared(data):
     return shared_x, T.cast(shared_y, "int32")
 
 #### load dataset which is a tuple of image array and result array
-def load_data(data=load_data.load_all()):
-    train, val, test = data
+def load_data(loader, img_type):
+    train, val, test = loader.load_for_learn(img_type, "CDR")
     return [shared(train), shared(val), shared(test)]
 
 #### Main class used to construct and train networks
@@ -86,38 +86,15 @@ class Network(object):
         self.output = self.layers[-1].output
         self.output_dropout = self.layers[-1].output_dropout
 
-    def feedforward(self, data, size=1):
-        cur_layer = self.layers[0]
-        data = data.reshape((size,)+cur_layer.image_shape[1:])
-        output = conv.conv2d(data, cur_layer.w,
-            image_shape = (size,)+cur_layer.image_shape[1:],
-            filter_shape = cur_layer.filter_shape)
-        output = downsample.max_pool_2d(output, ds=cur_layer.poolsize, ignore_border=True)
+    def feedforward(self, data):
+        print self.output.eval({self.x: data})
 
-        cur_layer = self.layers[1]
-        data = output.eval()
-        output = conv.conv2d(data, cur_layer.w,
-            image_shape = (size,)+cur_layer.image_shape[1:],
-            filter_shape = cur_layer.filter_shape)
-        output = downsample.max_pool_2d(output, ds=cur_layer.poolsize, ignore_border=True)
-
-        cur_layer = self.layers[2]
-        data = output.eval()
-        output = sigmoid(np.dot(data.reshape(3200,), cur_layer.w.get_value())+cur_layer.b.get_value())
-
-        cur_layer = self.layers[3]
-        data = output.eval()
-        output = softmax((1-cur_layer.p_dropout)*T.dot(data, cur_layer.w.get_value()) + cur_layer.b.get_value())
-        y_out = T.argmax(output, axis=1).eval()
-
-        return output.eval()
-
-    def save(self, filepath="", filename="trained_net.pkl"):
+    def save(self, filename):
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
-    def load(filepath="", filename="trained_net.pkl"):
+    def load(filename):
         with open(filename, 'rb') as inpt:
             return pickle.load(inpt)
 
@@ -182,6 +159,7 @@ class Network(object):
                 if iteration % 10 == 0:
                     print("Training mini-batch number {0}".format(iteration))
                 cost_ij = train_mb(minibatch_index)
+                print cost_ij
                 if (iteration+1) % num_training_batches == 0:
                     validation_accuracy = np.mean(
                         [validate_mb_accuracy(j) for j in xrange(num_validation_batches)])
@@ -229,7 +207,7 @@ class ConvPoolLayer(object):
         self.filter_shape = filter_shape
         self.image_shape = image_shape
         self.poolsize = poolsize
-        self.activation_fn=activation_fnsigmoid
+        self.activation_fn=sigmoid
         # initialize weights and biases
         n_out = (filter_shape[0]*np.prod(filter_shape[2:])/np.prod(poolsize))
         self.w = theano.shared(
@@ -332,6 +310,3 @@ def dropout_layer(layer, p_dropout):
         np.random.RandomState(0).randint(999999))
     mask = srng.binomial(n=1, p=1-p_dropout, size=layer.shape)
     return layer*T.cast(mask, theano.config.floatX)
-
-#### Inverse functions
-# def softmax_inverse()
