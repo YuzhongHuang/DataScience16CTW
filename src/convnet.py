@@ -79,16 +79,25 @@ class Network(object):
         self.params = [param for layer in self.layers for param in layer.params]
         self.x = T.matrix("x")
         self.y = T.ivector("y")
+
+        # Build network structures based on the input layers
         init_layer = self.layers[0]
         init_layer.set_inpt(self.x, self.x, self.mini_batch_size)
         for j in xrange(1, len(self.layers)):
             prev_layer, layer  = self.layers[j-1], self.layers[j]
             layer.set_inpt(
                 prev_layer.output, prev_layer.output_dropout, self.mini_batch_size)
+
+        # set the output function to be the output from last layer
         self.output = self.layers[-1].output
         self.output_dropout = self.layers[-1].output_dropout
 
     def feedforward(self, data):
+        """Takes a list of image data and returns the result based on the trained
+        model. Note that the size of the image list should be same to the mini batch
+        size
+
+        """
         return self.output.eval({self.x: data})
 
     def save(self, filename):
