@@ -26,6 +26,8 @@ from theano.tensor.nnet import softmax
 from theano.tensor import shared_randomstreams
 from theano.tensor.signal import downsample
 
+from PIL import Image
+
 # Local helping libraries
 import load_data
 
@@ -45,8 +47,8 @@ if GPU:
     theano.config.floatX = 'float32'
 else:
     print "Running with a CPU"
-
 #### theano shared data
+
 def shared(data):
     """Place the data into shared variables.  This allows Theano to copy
     the data to the GPU, if one is available.
@@ -87,7 +89,7 @@ class Network(object):
         self.output_dropout = self.layers[-1].output_dropout
 
     def feedforward(self, data):
-        print self.output.eval({self.x: data})
+        return self.output.eval({self.x: data})
 
     def save(self, filename):
         with open(filename, 'wb') as output:
@@ -310,3 +312,5 @@ def dropout_layer(layer, p_dropout):
         np.random.RandomState(0).randint(999999))
     mask = srng.binomial(n=1, p=1-p_dropout, size=layer.shape)
     return layer*T.cast(mask, theano.config.floatX)
+
+
