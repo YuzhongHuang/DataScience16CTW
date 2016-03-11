@@ -7,7 +7,7 @@ Cross sectional MRI brain image data from Open Access Series of Imaging Studies 
 Wilson Tang and Yuzhong Huang
 
 ## Project Description
-Healthcare is an ever evolving field and medical imaging is an essential tool for diagnosing and assessing various conditions from neurodegenerative diseases like Alzheimer’s to characterizing overall health based on factors like brain volume. Developing tools to better 
+Healthcare is an ever evolving field and medical imaging is an essential tool for diagnosing and assessing various conditions from neurodegenerative diseases like Alzheimer’s to characterizing overall health based on factors like brain volume. To understand how MRI images and CDR related and explore more about image processing and deep learning, we built a 6-layer convolutional neural network using theano for a MRI based CDR prediction model.
 
 ## Learning Goals
 1. Dive into algorithms(neural networks round 2!) and create them by hand as much as possible (inside image processing and machine learning) 
@@ -18,7 +18,7 @@ Healthcare is an ever evolving field and medical imaging is an essential tool fo
 
 ## MVP
 
-We will create a basic visualization tool that can create a virtual brain MRI image based chosen age, nWBV, gender and other attributes.
+We will create a basic visualization tool that can create a virtual brain MRI image based their clinical dementia ratings.
 
 ## Stretch Goals
 
@@ -26,7 +26,7 @@ We will add another tool to assess an image the user inputs and plot their data 
 
 ## Final Deliverable
 
-Interactive website or tool that will predict patient’s brain age, clinical dementia rating (CDR) and normalized whole-brain volume (nWBV) based on input MRI brain image. And potentially compare input MRI to the generalized virtual MRI brain image. The comparison will also include visualization of patient’s CDR and nWBV data, specifically, where is their brain in the distribution of the brains of their peers. Our stretch goal is to make virtual MRI image generator with a toolbar to adjust age, so that the tool can also be used by doctors who want to double check their patient’s brain status. The visualization tool might also be a good education tool for general audience.
+Tool or data visualization that will predict patient’s clinical dementia rating (CDR) based on input MRI brain image. And potentially compare input MRI to the generalized virtual MRI brain image. The comparison will also include visualization of patient’s CDR, specifically, where is their brain in the distribution of the brains of their peers and which part of the brain is our model paying attention to. Our stretch goal is to make virtual MRI image generator with a toolbar to adjust age, so that the tool can also be used by doctors who want to double check their patient’s brain status. The visualization tool might also be a good education tool for general audience.
 
 
 ## Workflow and Schedule
