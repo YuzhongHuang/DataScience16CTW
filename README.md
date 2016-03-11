@@ -29,8 +29,12 @@ Finally, we just put everything together and create a simple tool to predict the
 
 - 'res' folder contains the example results of our project. Specifically, saliency maps for different type of MRI images.
 
-- All the project description files are under directory 'files'
+- All the project description files are under directory 'files'. Including project proporsal, reflection etc.
 
 - Each source files under 'src' is well-documented and relatively self-explanatory. Folder 'data_processing' and 'image_processing' contains file that process the raw data to be useful for our model. 'CDR_saliency', 'CDR_conv', 'DATA_loader' contains saliency map objects, trained network objects and data loader object respectively. 'testdata' includes image data for 'learn_about_your_brain.py'.
 
 - You may want to use 'train.py' to train your own neural network; 'feed.py' to feed data into your trained network or just use the example network we provided; 'make_saliency_map.py' to make a saliency map to make your own saliency map to visualize features your network is paying attention to. You can bring up the ipython notebook 'visualize.ipynb' to see the saliency map. Finally, you can use 'learn_about_your_brain.py' to see our model's CDR prediction for the given MRI image and its feature interests. Details for how to use each files are provided in the documentation.
+
+## Background Information
+
+Please refer to our [git wiki](https://github.com/YuzhongHuang/DataScience16CTW/wiki)
