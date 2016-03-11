@@ -56,9 +56,9 @@ class data_loader:
 		val = self.train_size + self.val_size
 
 		return (
-				(self.img_data[img_type][0:120], 		self.res_data[result][0:120]), \
-				(self.img_data[img_type][120:240],	self.res_data[result][120:240]), \
-				(self.img_data[img_type][240:-1], 		self.res_data[result][240:-1]), \
+				(self.img_data[img_type][0:train], 		self.res_data[result][0:train]), \
+				(self.img_data[img_type][train:val],	self.res_data[result][train:val]), \
+				(self.img_data[img_type][val:-1], 		self.res_data[result][val:-1]), \
 				)
 
 	#### Helper function for __init__ to grab image and result data
@@ -79,7 +79,7 @@ class data_loader:
 		lst = df[column].tolist()
 		return numpy.asarray(lst)
 
-
+# create a loader if not already exists
 data_loader().save("./DATA_loader/loader")
 
 

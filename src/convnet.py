@@ -74,6 +74,7 @@ class Network(object):
         by stochastic gradient descent.
 
         """
+
         self.layers = layers
         self.mini_batch_size = mini_batch_size
         self.params = [param for layer in self.layers for param in layer.params]
@@ -98,14 +99,23 @@ class Network(object):
         size
 
         """
+
         return self.output.eval({self.x: data})
 
     def save(self, filename):
+        """save the trained network to a local file using pickle
+
+        """
+
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
     def load(filename):
+        """load a trained network from a local file using pickle
+
+        """
+
         with open(filename, 'rb') as inpt:
             return pickle.load(inpt)
 
@@ -132,6 +142,8 @@ class Network(object):
         # define functions to train a mini-batch, and to compute the
         # accuracy in validation and test mini-batches.
         i = T.lscalar() # mini-batch index
+
+        # Theano functions for learning
         train_mb = theano.function(
             [i], cost, updates=updates,
             givens={
@@ -162,6 +174,7 @@ class Network(object):
                 self.x:
                 test_x[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
+
         # Do the actual training
         best_validation_accuracy = 0.0
         for epoch in xrange(epochs):
@@ -279,6 +292,10 @@ class FullyConnectedLayer(object):
         return T.mean(T.eq(y, self.y_out))
 
 class SoftmaxLayer(object):
+    """ Instead of just using fully connected network for output, using a
+    SoftmaxLayer can normalize all the possible results
+
+    """
 
     def __init__(self, n_in, n_out, p_dropout=0.0):
         self.n_in = n_in
@@ -311,7 +328,7 @@ class SoftmaxLayer(object):
         return T.mean(T.eq(y, self.y_out))
 
 
-#### Miscellanea
+#### util functions
 def size(data):
     "Return the size of the dataset `data`."
     return data[0].get_value(borrow=True).shape[0]
