@@ -12,7 +12,7 @@ Healthcare is an ever evolving field and medical imaging is an essential tool fo
 To understand how MRI images and CDR related and explore more about image processing and deep learning, we built a 6-layer convolutional neural network using theano for a MRI based CDR prediction model.
 
 ## Project Details
-We started out by downsizing the image data since the neural network structure we are referencing typically works better with smaller images(we used data from OASIS). Specifically, we change "COR" images from 176*176 to 44*44; "SAG" images from 208*176 to 52*44; "TRA" images from 176*208 to 44*52. After data processing, we built a 6-layer convolutional neural network in a structure of "CONV-POOL-CONV-POOL-FULLYCONNECTED-SOFTMAX". We used stochastic gradient decent and back propagation in training our model. After 100 epochs of training, we got about 82% score in the test data.
+We started out by downsizing the image data since the neural network structure we are referencing typically works better with smaller images(we used data from OASIS).  After data processing, we built a 6-layer convolutional neural network with two convolutional layers, two pool layer, one fully-connected layer and a Softmax layer. We used stochastic gradient decent and back propagation in training our model. After 100 epochs of training, we got about 82% score in the test data.
 
 Note that during our data processing, we also convert all the 'NAN' CDR value to 0 since most of the 'NAN' subject's age tends to be relatively young and we assume that their CDR is 0. That might cause some errors in our model though. However, since we only have 416 data entries and a large portion of them are 'NAN' in CDR, we finally decide to use the data anyway.
 
@@ -27,11 +27,11 @@ Finally, we just put everything together and create a simple tool to predict the
 
 - All the MRI image data in the form of GIF and result data in CSV are under folder 'data'
 
-- 'res' folder contains the example results of our project. Specifically, saliency maps for different type of MRI images.
+- res folder contains the example results of our project. Specifically, saliency maps for different type of MRI images.
 
-- All the project description files are under directory 'files'. Including project proporsal, reflection etc.
+- All the project description files are under directory files. Including project proposal, reflection etc.
 
-- Each source files under 'src' is well-documented and relatively self-explanatory. Folder 'data_processing' and 'image_processing' contains file that process the raw data to be useful for our model. 'CDR_saliency', 'CDR_conv', 'DATA_loader' contains saliency map objects, trained network objects and data loader object respectively. 'testdata' includes image data for 'learn_about_your_brain.py'.
+- Each source files under src is well-documented and relatively self-explanatory. Folder 'data_processing' and 'image_processing' contains file that process the raw data to be useful for our model. 'CDR_saliency', 'CDR_conv', 'DATA_loader' contains saliency map objects, trained network objects and data loader object respectively. 'testdata' includes image data for 'learn_about_your_brain.py'.
 
 - You may want to use 'train.py' to train your own neural network; 'feed.py' to feed data into your trained network or just use the example network we provided; 'make_saliency_map.py' to make a saliency map to make your own saliency map to visualize features your network is paying attention to. You can bring up the ipython notebook 'visualize.ipynb' to see the saliency map. Finally, you can use 'learn_about_your_brain.py' to see our model's CDR prediction for the given MRI image and its feature interests. Details for how to use each files are provided in the documentation.
 
