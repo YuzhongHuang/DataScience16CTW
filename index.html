@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Mri-based-cdr-prediction-model by YuzhongHuang</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Mri-based-cdr-prediction-model</h1>
+          <h2>This is the base repo for the &quot;Change the World&quot; project for Data Science at Olin College, Spring 2016.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/YuzhongHuang/MRI-Based-CDR-Prediction-Model/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/YuzhongHuang/MRI-Based-CDR-Prediction-Model/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/YuzhongHuang/MRI-Based-CDR-Prediction-Model" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="early-stage-dementia-prediction-using-convolutional-neural-networks" class="anchor" href="#early-stage-dementia-prediction-using-convolutional-neural-networks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Early-Stage Dementia Prediction using Convolutional Neural Networks</h1>
+
+<p>This is a Project Site for Data Science 2016 at Olin College of Engineering</p>
+
+<p>This website is intended to be an informative data visualization and tool and offer some potential directions and conclusions based on our model. It should NOT be used as an actual diagnostic tool.</p>
+
+<h2>
+<a id="what-is-dementia" class="anchor" href="#what-is-dementia" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is Dementia?</h2>
+
+<p>"Dementia is not a specific disease. It's an overall term that describes a wide range of symptoms associated with a decline in memory or other thinking skills severe enough to reduce a person's ability to perform everyday tasks"[1]</p>
+
+<p>Dementia is generally a progressive disease that[1]:</p>
+
+<ul>
+<li>  Affects more than an estimated 5 million individuals in the United States.</li>
+<li>  6th Leading Cause of Death in the United States.</li>
+<li>  Cannot be prevented, cured, or slowed.</li>
+<li>  Less than half(45%) of these individuals have been actually diagnosed.</li>
+</ul>
+
+<p>Dementia is usually diagnosed based on a careful medical history, physical examination, laboratory tests, behavioral and functional observations, and recently brain imaging.It is caused by damage to the brain cells, disrupting their ability to communicate and thus function properly. In general dementia is only when 2 or more core mental functions: memory, language, visual perception, ability to focus, problem solving, and reasoning are impaired.[1]</p>
+
+<h2>
+<a id="use-of-brain-imaging-in-diagnosing-dementia" class="anchor" href="#use-of-brain-imaging-in-diagnosing-dementia" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Use of Brain Imaging in Diagnosing Dementia</h2>
+
+<p>The rise of brain imaging utilizing medical imaging technologies such as computer tomography(CT) and magnetic resonance imaging (MRI) has, according to the Neuroimaging Work Group of the Alzheimer's Association,"offer[ed] only relatively modest incremental benefits for the diagnosis of AD" due to the relatively high accuracy of present methods(~80%).[2]</p>
+
+<p>From the extensive clinical research there have been multiple progression markers identified to be indicative of Alzheimer's[2]:</p>
+
+<ul>
+<li><p>General brain atrophy over time(from serial MRI).</p></li>
+<li><p>Brain Boundary Shift Integral</p></li>
+<li>  Ventricular CSF Measurements</li>
+<li><p>Sample size estimates based on homogeneity of brain imaging data</p></li>
+<li><p>Atrophy in the Medial Temporal Lobe.</p></li>
+<li><p>Hippocampus</p></li>
+<li>  Etorhinal cortex</li>
+</ul>
+
+<h2>
+<a id="project-overview" class="anchor" href="#project-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Overview</h2>
+
+<p>The goal of this project was to create both informative data visualizations and a data driven-tool using the data set we chose (<a href="http://www.oasis-brains.org/">OASIS MRI Scans</a>). We used our model as both a predictive tool but also an informative one by creating saliency maps.</p>
+
+<h3>
+<a id="project-methods" class="anchor" href="#project-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Methods</h3>
+
+<p>We started out by downsizing the image data since the neural network structure we are referencing typically works better with smaller images(we used data from <a href="http://www.oasis-brains.org/">OASIS</a>). Specifically, we change "COR" images from 176<em>176 to 44</em>44; "SAG" images from 208<em>176 to 52</em>44; "TRA" images from 176<em>208 to 44</em>52. After data processing, we built a 6-layer convolutional neural network in a structure of "CONV-POOL-CONV-POOL-FULLYCONNECTED-SOFTMAX". We used stochastic gradient decent and back propagation in training our model. After 100 epochs of training, we got about 82% score in the test data.</p>
+
+<p>Note that during our data processing, we also convert all the 'NAN' CDR value to 0 since most of the 'NAN' subject's age tends to be relatively young and we assume that their CDR is 0. That might cause some errors in our model though. However, since we only have 416 data entries and a large portion of them are 'NAN' in CDR, we finally decide to use the data anyway.</p>
+
+<p>To visualize our trainning, we used a method called saliency map. We basically used a black box to run through an image to create a series of black-boxed images. We then fed these images to our model and get their prediction probablities. And then compute the square differences between the original image and black-boxed images. Since these images have black box over different places, by computing the square differences, we can see how much the model is dependent on the part we are covering with the black box. Then we just placed the square errors into a matrix of the same size as the original image. We can use this matrix to visualize the matrix of square errors to see how important each part of the image.</p>
+
+<p>Finally, we just put everything together and create a simple tool to predict the CDR of input MRI image and shows a saliency map of the image.</p>
+
+<h2>
+<a id="results-and-interpretation" class="anchor" href="#results-and-interpretation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Results and Interpretation</h2>
+
+<p>A standard brain MRI can be taken from 3 views: Sagittal(from the side). Transverse(from the front/back), Horizontal(from the top), which offer different clarity of various brain structures. The data set was provided in the three different views and we created three different saliency maps to identify what our model was paying attention to.</p>
+
+<p><img src="https://lh3.googleusercontent.com/-tQkDf5nY8o4/VuI3b7SuA7I/AAAAAAAAAfw/oSq0YCucji4acZGIMPlAyarDisij_XQWQ/s0/brains.jpg" alt=""></p>
+
+<p>Figure 1: Reference Diagram for localized brain structures in MRI Images(*image for sagittal view is mirror of Saliency Map) vs. Saliency map for final model, patients with dementia, add patients without dementia in three views(horizontal,transverse,sagittal)</p>
+
+<p>By comparing the images:</p>
+
+<ul>
+<li>  From the data within the column of patients without dementia we can see regions of interest that the model is looking at to determine what regions are indicative of dementia.</li>
+<li>  From the 2nd column of images(final map) we see that the model is actually paying attention to most of the brain with a special focus on the hippocampus and midbrain areas in the horizontal and transverse views, which matches clinical research.</li>
+<li>  From the 3rd column (patients w dementia) the model highlights parts of the occipital lobe and cerebellum (horizontal), (),frontal lobe and cerebellum(sagittal).</li>
+<li>  From the 4th column (patients w/o dementia) the model highlights the hippocampus, midbrain, and ventricle areas (horizontal and transverse) and the hippocampus, caudate, and part of the frontal lobe in the sagittal view.</li>
+</ul>
+
+<p>The model suggests that:</p>
+
+<ul>
+<li>  The overall model is able to identify regions of interests validated by clinical research in the horizontal and transverse views but is unable to inside the sagittal view.</li>
+<li>  When comparing the overall saliency map. we see that the model ends up paying attention to a lot of other features(most of the brain) which seem to indicate the model could be potentially be paying attention otdrive the overall brain volume. This could be potentially misleading without proper temporal data and suggests that the model is unable to differentiate between noise</li>
+<li>  Interestingly the sagittal view suggests that the prefrontal lobe and caudate are also viable features to detect dementia. This suggests a potentialrelationship not suggested by literature.</li>
+</ul>
+
+<h2>
+<a id="predictive-model" class="anchor" href="#predictive-model" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Predictive Model</h2>
+
+<p>To use our model refer to the ReadMe in our <a href="https://github.com/YuzhongHuang/DataScience16CTW">github_repository</a></p>
+
+<h2>
+<a id="project-members" class="anchor" href="#project-members" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Members:</h2>
+
+<p>Yuzhong Huang</p>
+
+<p>Wilson Tang</p>
+
+<h4>
+<a id="citations-and-references" class="anchor" href="#citations-and-references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Citations and References</h4>
+
+<p>[1]- What Is Dementia? (n.d.). Retrieved March 10, 2016, from <a href="http://www.alz.org/what-is-dementia.asp">http://www.alz.org/what-is-dementia.asp</a></p>
+
+<p>[2]-Weiner et al., 2005 M. Weiner, M. Albert, C. DeCarli, S. de Kosky, M. de Leon, N.L. Foster, N. Fox, R. Frank, R. Frackowiak, C. Jack, W. Jagust, D. Knopman, J. Morris, R.C. Petersen, E. Reiman, P. Scheltens, G. Small, H. Soininen, L. Thal, L. Wahlund, W. Thies, K. Khachaturian The Use of MRI and PET for Clinical Diagnosis of Dementia and Investigation of Cognitive Impairment: A Consensus Report Alzheimer's Association, Chicago, IL (2005)</p>
+        </section>
+
+        <footer>
+          Mri-based-cdr-prediction-model is maintained by <a href="https://github.com/YuzhongHuang">YuzhongHuang</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
